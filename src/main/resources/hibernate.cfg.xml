@@ -20,7 +20,7 @@
         <mapping class="org.example.model.Car"/>
         <!--
         TODO: add mapping classes User and Motorcycle
-        !>
+        -->
 
     </session-factory>
 </hibernate-configuration>
