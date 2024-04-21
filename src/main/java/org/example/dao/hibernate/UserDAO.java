@@ -1,5 +1,6 @@
 package org.example.dao.hibernate;
 
+import jakarta.persistence.Query;
 import org.example.dao.IUserRepository;
 import org.example.model.User;
 import org.hibernate.Session;
@@ -15,8 +16,7 @@ public class UserDAO implements IUserRepository {
         Session session = sessionFactory.openSession();
         User user = null;
         Transaction transaction = null;
-        //TODO: Finish this method
-        return user;
+        return session.get(User.class, login);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package org.example.dao.hibernate;
 
-
 import org.example.dao.IVehicleRepository;
 import org.example.model.User;
 import org.example.model.Vehicle;
@@ -10,13 +9,21 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import java.util.Collection;
-
+import java.util.List;
 
 public class VehicleDAO implements IVehicleRepository {
-    SessionFactory sessionFactory;
+    private static VehicleDAO instance;
+    private SessionFactory sessionFactory;
 
-    public VehicleDAO(SessionFactory sessionFactory) {
+    private VehicleDAO(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+
+    public static VehicleDAO getInstance(SessionFactory sessionFactory) {
+        if (instance == null) {
+            instance = new VehicleDAO(sessionFactory);
+        }
+        return instance;
     }
 
     @Override
@@ -53,19 +60,25 @@ public class VehicleDAO implements IVehicleRepository {
         }
     }
 
-
     @Override
     public boolean addVehicle(Vehicle vehicle) {
-        Session session = null;
-        Transaction transaction = null;
-        boolean success=false;
-        //TODO:Finish this method
-        return success;
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(vehicle);
+        transaction.commit();
+        session.close();
+        return true;
     }
+
     @Override
     public boolean removeVehicle(String plate) {
-        //TODO: Implement removeVehicle method.
-        return false;
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Vehicle vehicle = session.get(Vehicle.class, plate);
+        session.delete(vehicle);
+        transaction.commit();
+        session.close();
+        return true;
     }
 
     @Override
@@ -79,21 +92,28 @@ public class VehicleDAO implements IVehicleRepository {
         }
     }
 
-    //Must implement old interface. Plate is no longer needed when User has Vehicle.
+    @Override
     public boolean returnVehicle(String plate,String login) {
-        //TODO:Implement returnVehicle method
-        return false;
-
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        User user = session.get(User.class, login);
+        Vehicle vehicle = session.get(Vehicle.class, plate);
+        vehicle.setUser(null);
+        vehicle.setRent(false);
+        user.setVehicle(null);
+        session.saveOrUpdate(user);
+        session.saveOrUpdate(vehicle);
+        transaction.commit();
+        session.close();
+        return true;
     }
 
     @Override
     public Collection<Vehicle> getVehicles() {
         Session session = sessionFactory.openSession();
-        try {
-            //TODO:finish this method
-            return null;
-        } finally {
-            session.close();
-        }
+        Query query = session.createQuery("from Vehicle");
+        List<Vehicle> vehicles = query.list();
+        session.close();
+        return vehicles;
     }
 }

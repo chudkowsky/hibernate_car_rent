@@ -16,9 +16,7 @@ public class App {
     public static  User user = null;
     private final Scanner scanner = new Scanner(System.in);
     private final IUserRepository iur = UserDAO.getInstance(HibernateUtil.getSessionFactory());
-
-    //TODO: Make VehicleDAO class a singleton.
-    private final IVehicleRepository ivr = new VehicleDAO(HibernateUtil.getSessionFactory());
+    private final IVehicleRepository ivr = VehicleDAO.getInstance(HibernateUtil.getSessionFactory());
 
     public void run() {
 
@@ -99,7 +97,13 @@ public class App {
                     String  removePlate = scanner.nextLine();
                     ivr.removeVehicle(removePlate);
                     break;
-                    //TODO: add logic for user add.
+                case "8":
+                    System.out.println("add user (only) separator is ; String login, String password");
+                    line = scanner.nextLine();
+                    arr = line.split(";");
+                    iur.addUser(new User(arr[0],
+                            arr[1]));
+                    break;
                 case "9":
                     System.out.println("remove user by login:");
                     String  removeLogin = scanner.nextLine();
